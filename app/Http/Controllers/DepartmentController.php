@@ -32,87 +32,49 @@ class DepartmentController extends Controller
             
         );
     }
-
-
-
-    public function put(Request $request) 
-    {     
-        $validatedData = $request->validate([         
+        private function savedepartmentData(department $department, Request $request) 
+        {     $validatedData = $request->validate([         
             'name' => 'required|min:3|max:256',         
-            'student_id' => 'required',         
+            'author_id' => 'required',         
             'description' => 'nullable',         
-            'grades' => 'nullable|numeric',         
-            'year' => 'numeric',                 
-            'display' => 'nullable'     
-        ]);      
-        
-        $department = new Department();
-        $department->name = $validatedData['name'];     
-        $department->student_id = $validatedData['student_id'];     
-        $department->description = $validatedData['description'];     
-        $department->grades = $validatedData['grades'];     
-        $department->year = $validatedData['year']; 
-        $department->fill($validatedData);   
-        $department->display = (bool) ($validatedData['display'] ?? false);
-        if ($request->hasFile('image')) {     
-            $uploadedFile = $request->file('image');     
-            $extension = $uploadedFile->clientExtension();     
-            $name = uniqid();     
-            $department->image =  $uploadedFile->storePubliclyAs(         
-                '/',          
-                $name . '.' . $extension,          
-                'uploads'    
-            ); 
-        }    
-        $department->save(); 
-
-        return redirect('/departments');  
-
-    }
-    public function update(department $department) 
-    {     
-        $students = Student::orderBy('name', 'asc')->get();      
-        return view(         
-            'department.form',         
-            [             
-                'title' => 'Edit department',             
-                'department' => $department,             
-                'students' => $students,         
-            ]     
-        ); 
-    } 
-
-    public function patch(department $department, Request $request) 
-    {     
-        $validatedData = $request->validate([         
-            'name' => 'required|min:3|max:256',         
-            'student_id' => 'required',         
-            'description' => 'nullable',         
-            'grades' => 'nullable|numeric',         
+            'price' => 'nullable|numeric',         
             'year' => 'numeric',         
             'image' => 'nullable|image',         
             'display' => 'nullable'     
-        ]);
+        ]); 
         $department->name = $validatedData['name'];     
-        $department->student_id = $validatedData['student_id'];     
+        $department->author_id = $validatedData['author_id'];     
         $department->description = $validatedData['description'];     
-        $department->grades = $validatedData['grades'];     
+        $department->price = $validatedData['price'];     
         $department->year = $validatedData['year'];     
-        $department->display = (bool) ($validatedData['display'] ?? false);
-        if ($request->hasFile('image')) {     
-            $uploadedFile = $request->file('image');     
-            $extension = $uploadedFile->clientExtension();     
-            $name = uniqid();     
-            $department->image =  $uploadedFile->storePubliclyAs(         
-                '/',          
-                $name . '.' . $extension,          
-                'uploads'     
-            ); 
-        }      
-        $department->save();      
+        $department->display = (bool) ($validatedData['display'] ?? false);      
         
-        return redirect('/departments/update/' . $department->id); 
+        if ($request->hasFile('image')) {         
+            $uploadedFile = $request->file('image');         
+            $extension = $uploadedFile->clientExtension();         
+            $name = uniqid();         
+            $department->image = $uploadedFile->storePubliclyAs(            
+                '/',             
+                $name . '.' . $extension,             
+                'uploads'         
+            );     
+        } 
+        $department->save();
     }
+    public function put(Request $request) 
+    {     
+        $department = new Department();     
+        $this->saveDepartmentData($department, $request);     
+        return redirect('/departments');
+    } 
+
+    public function patch(Department $department, Request $request) 
+    {     
+        $this->saveDepartmentData($department, $request);     
+        return redirect('/departments/update/' . $department->id); 
+    }  
+
+    
 
     public function delete(department $department) 
     {     
