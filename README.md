@@ -1,2 +1,2 @@
-# LaravelCRUD_project2
+# Music Playlist_LaravelCRUD
 New Repository
